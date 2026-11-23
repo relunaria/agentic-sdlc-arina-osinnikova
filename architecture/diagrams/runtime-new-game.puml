@@ -1,0 +1,22 @@
+@startuml runtime-new-game
+!pragma layout smetana
+
+actor Player
+participant "Frontend" as FE
+participant "API Layer" as API
+participant "Game Session" as GS
+participant "Board Management" as BM
+participant "Persistence" as P
+
+Player -> FE: Start new game
+FE -> API: POST /games {difficulty}
+API -> GS: create_game(difficulty)
+GS -> BM: create_empty(rows, cols)
+BM --> GS: empty board
+GS -> P: save(game)
+P --> GS: game saved
+GS --> API: game state
+API --> FE: 201 with game state
+FE --> Player: Render board
+
+@enduml
