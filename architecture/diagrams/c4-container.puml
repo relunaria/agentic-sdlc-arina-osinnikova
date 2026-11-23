@@ -1,0 +1,20 @@
+@startuml c4-container
+!pragma layout smetana
+!include <C4/C4_Container>
+
+title Container Diagram — Minesweeper Web Application
+
+Person(player, "Player", "Plays the game via browser.")
+
+System_Boundary(minesweeper, "Minesweeper Web App") {
+    Container(frontend, "Frontend", "React + TypeScript", "Renders the board, handles user input, calls the backend REST API.")
+    Container(backend, "Backend API", "Python + FastAPI", "Provides REST API for frontend communication.")
+    ContainerDb(db, "Database", "SQLite", "Stores game state.")
+}
+
+Rel(player, frontend, "Uses")
+Rel(frontend, backend, "Calls REST API")
+Rel(backend, db, "Reads and writes")
+
+SHOW_LEGEND()
+@enduml

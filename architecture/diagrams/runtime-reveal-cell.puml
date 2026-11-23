@@ -1,0 +1,36 @@
+@startuml runtime-reveal-cell
+!pragma layout smetana
+
+actor Player
+participant "Frontend" as FE
+participant "API Layer" as API
+participant "Game Session" as GS
+participant "Board Management" as BM
+participant "Game Engine" as GE
+participant "Persistence" as P
+
+Player -> FE: Click cell
+FE -> API: POST /games/{id}/reveal {row, col}
+API -> GS: reveal(id, row, col)
+GS -> GS: Validate game state
+alt Game not finished
+    opt first reveal (status = new)
+        GS -> BM: place_mines(board, count, safe_cell)
+        BM --> GS: board with mines
+    end
+    GS -> GE: reveal(board, row, col)
+    GE -> GE: flood-fill empty areas
+    GE -> GE: evaluate_status(board)
+    GE --> GS: updated board + status
+    GS -> P: save(game)
+    P --> GS: game saved
+    GS --> API: updated game state
+    API --> FE: 200 with game state
+    FE --> Player: Update display
+else Game finished
+    GS --> API: 409 Conflict
+    API --> FE: 409
+    FE --> Player: Show error
+end
+
+@enduml

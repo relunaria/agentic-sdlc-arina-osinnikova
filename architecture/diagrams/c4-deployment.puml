@@ -1,0 +1,25 @@
+@startuml c4-deployment
+!pragma layout smetana
+!include <C4/C4_Deployment>
+
+title Deployment Diagram — Minesweeper Web Application
+
+Deployment_Node(browser, "Player's Browser", "Modern web browser") {
+    Container(frontend, "Frontend", "React + TypeScript", "Renders the game board, handles user input.")
+}
+
+Deployment_Node(netlify, "Netlify", "Static hosting") {
+    Container(frontendStatic, "Frontend Static", "React build", "Serves static assets.")
+}
+
+Deployment_Node(backendHost, "Backend Host", "Docker container on PaaS with persistent disk") {
+    Container(backend, "Backend API", "Python + FastAPI", "Provides REST API for frontend. Must allow CORS for frontend origin.")
+    ContainerDb(db, "SQLite Database", "SQLite file", "Stores game state on persistent volume.")
+}
+
+Rel(frontend, frontendStatic, "Loads static assets")
+Rel(frontend, backend, "Calls REST API", "HTTPS")
+Rel(backend, db, "Reads and writes")
+
+SHOW_LEGEND()
+@enduml

@@ -1,0 +1,25 @@
+@startuml c4-component-backend
+!pragma layout smetana
+!include <C4/C4_Component>
+
+title Component Diagram — Backend API
+
+Container_Boundary(backend, "Backend API") {
+    Component(apiLayer, "API Layer", "Python module (FastAPI routers)", "HTTP and validation only, calls Game Session.")
+    Component(gameSession, "Game Session", "Python module", "Game lifecycle and status (in progress/won/lost), orchestrates Engine + Persistence.")
+    Component(gameEngine, "Game Engine", "Python module", "Pure rule logic (reveal, flood fill, flag, win/loss), no I/O.")
+    Component(boardMgmt, "Board Management", "Python module", "Grid creation, mine placement, adjacent-mine counts.")
+    Component(persistence, "Persistence", "Python module", "Repository over SQLite.")
+
+    Rel(apiLayer, gameSession, "Calls")
+    Rel(gameSession, gameEngine, "Orchestrates")
+    Rel(gameSession, persistence, "Persists state")
+    Rel(gameEngine, boardMgmt, "Uses")
+}
+
+ContainerDb(db, "Database", "SQLite")
+
+Rel(persistence, db, "Reads and writes")
+
+SHOW_LEGEND()
+@enduml

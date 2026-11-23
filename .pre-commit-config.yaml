@@ -4,7 +4,9 @@ repos:
     rev: v5.0.0
     hooks:
       - id: trailing-whitespace
+        exclude: '\.svg$'
       - id: end-of-file-fixer
+        exclude: '\.svg$'
       - id: check-yaml
       - id: check-json
       - id: check-toml
@@ -53,3 +55,9 @@ repos:
         language: system
         stages: [commit-msg]
         always_run: true
+      - id: plantuml-validation
+        name: PlantUML Validation
+        entry: bash scripts/hooks/validate-plantuml.sh
+        language: system
+        files: '\.puml$'
+        pass_filenames: false
