@@ -14,9 +14,11 @@ FE -> API: POST /games/{id}/reveal {row, col}
 API -> GS: reveal(id, row, col)
 GS -> GS: Validate game state
 alt Game not finished
+    opt first reveal (status = new)
+        GS -> BM: place_mines(board, count, safe_cell)
+        BM --> GS: board with mines
+    end
     GS -> GE: reveal(board, row, col)
-    GE -> BM: place_mines(board, count, safe_cell)
-    BM --> GE: board with mines
     GE -> GE: flood-fill empty areas
     GE -> GE: evaluate_status(board)
     GE --> GS: updated board + status

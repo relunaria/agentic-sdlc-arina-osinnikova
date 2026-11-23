@@ -10,9 +10,9 @@ The runtime behavior is based on confirmed API contracts and module responsibili
 2. Frontend makes POST /games request with difficulty parameter
 3. Backend API Layer receives request and validates input
 4. Backend Game Session calls Board Management to create empty board (dimensions only)
-5. Backend Game Session creates new session with empty board state
+5. Backend Game Session creates new session with status `new` (empty board, no mines)
 6. Backend calls Persistence to save game state to SQLite
-7. Backend returns 201 with initial game state (no mines yet)
+7. Backend returns 201 with initial game state
 8. Frontend renders the board
 
 ## 6.3 First Reveal Flow
@@ -21,14 +21,16 @@ The runtime behavior is based on confirmed API contracts and module responsibili
 2. Frontend sends POST /games/{id}/reveal with row and col
 3. Backend API Layer receives request and validates coordinates
 4. Backend Game Session validates game state (not finished)
-5. Backend Game Session calls Board Management:
+5. Backend Game Session detects status is `new`, calls Board Management:
    - Place mines on the board, excluding the clicked cell
    - Calculate adjacent mine counts
-6. Backend Game Engine reveals the clicked cell and performs flood-fill for empty areas
-7. Backend Game Engine evaluates game status (win/loss/continue)
-8. Backend Game Session calls Persistence to save updated state to SQLite
-9. Backend returns updated game state
-10. Frontend updates display
+6. Backend Game Session calls Game Engine:
+   - Reveal the clicked cell
+   - Perform flood-fill for empty areas
+   - Evaluate game status (win/loss/continue)
+7. Backend calls Persistence to save updated state to SQLite
+8. Backend returns updated game state
+9. Frontend updates display
 
 ## 6.4 Subsequent Moves Flow
 
@@ -38,7 +40,7 @@ The runtime behavior is based on confirmed API contracts and module responsibili
 4. Backend Game Session validates game state (not finished):
    - If game already finished, returns 409 Conflict
 5. Backend Game Engine applies rule logic (reveal, flag, win/loss check)
-6. Backend Game Session calls Persistence to save updated state to SQLite
+6. Backend calls Persistence to save updated state to SQLite
 7. Backend returns updated game state
 8. Frontend updates display
 
@@ -58,7 +60,7 @@ The runtime behavior is based on confirmed API contracts and module responsibili
 | API Layer | HTTP validation, calls Game Session |
 | Game Session | Lifecycle management, orchestrates Engine + Persistence |
 | Game Engine | Pure rule logic, uses Board Management |
-| Board Management | Grid creation, mine placement, adjacent counts |
+| Board Management | Grid creation, mine placement (on first reveal only), adjacent counts |
 | Persistence | SQLite repository, called by Game Session |
 
 ## 6.7 Concurrency
