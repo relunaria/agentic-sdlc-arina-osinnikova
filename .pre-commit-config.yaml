@@ -37,6 +37,7 @@ repos:
     rev: 1.8.3
     hooks:
       - id: bandit
+        exclude: ^tests/
         args: [-c, pyproject.toml]
         additional_dependencies: ["bandit[toml]"]
 
@@ -61,3 +62,9 @@ repos:
         language: system
         files: '\.puml$'
         pass_filenames: false
+      - id: docker-test
+        name: Docker build and test
+        entry: bash scripts/hooks/docker-test.sh
+        language: system
+        pass_filenames: false
+        always_run: true
