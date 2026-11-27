@@ -64,6 +64,7 @@ repos:
         pass_filenames: false
       - id: docker-test
         name: Docker build and test
+        stages: [pre-commit]
         entry: bash scripts/hooks/docker-test.sh
         language: system
         pass_filenames: false
